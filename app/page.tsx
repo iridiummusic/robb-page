@@ -1,7 +1,7 @@
 import { getCatalog, formatDate, typeLabel } from "@/lib/catalog";
 import { getPlatformLinks } from "@/lib/platforms";
 import { paletteFromCover } from "@/lib/palette";
-import { getClips, getProducts, upcomingConcerts } from "@/lib/extras";
+import { getClips, getProducts, upcomingConcerts, clipFor } from "@/lib/extras";
 import { site } from "@/site.config";
 import Stage from "@/components/Stage";
 import ListenLinks from "@/components/ListenLinks";
@@ -31,12 +31,17 @@ export default async function Home() {
     site.upcoming && new Date(site.upcoming.date).getTime() > Date.now() ? site.upcoming : null;
   const heroCover = upcoming?.coverUrl ?? latest.cover;
 
-  const [links, palette, clips, products] = await Promise.all([
+  const [baseLinks, palette, allClips, products] = await Promise.all([
     getPlatformLinks(latest),
     paletteFromCover(heroCover),
     getClips(),
     getProducts(),
   ]);
+  const latestClip = clipFor(latest.name, allClips);
+  const links = latestClip
+    ? [...baseLinks, { key: "youtube", label: "YouTube", url: `https://www.youtube.com/watch?v=${latestClip.id}` }]
+    : baseLinks;
+  const clips = allClips.slice(0, 6);
   const concerts = upcomingConcerts();
   const socials = Object.entries(site.socials).filter(([, url]) => url);
 
@@ -179,7 +184,7 @@ export default async function Home() {
                 ))}
               </ul>
             )}
-            <p className="legal">© {new Date().getFullYear()} {site.artist} · Iridium Music · <a className="legal-link" href="/mentions-legales">Mentions légales et confidentialité</a></p>
+            <p className="legal">{site.tagline} © {new Date().getFullYear()} {site.artist} · Iridium Music · <a className="legal-link" href="/mentions-legales">Mentions légales et confidentialité</a></p>
           </footer>
         </main>
       </div>
