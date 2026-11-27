@@ -9,7 +9,7 @@ Ta page à toi, sans Listenify : chaque sortie a son lien permanent, la page se 
 | Sorties, pochettes, dates | Catalogue Deezer de ROBB (public, sans compte) | toutes les heures |
 | Liens Deezer et Apple Music (par le code-barres UPC), Spotify si une clé Spotify est ajoutée, sinon une recherche Spotify ciblée | Deezer + API publique iTunes | toutes les 24 h |
 | Couleurs de la page | Teinte dominante de la dernière pochette | à chaque nouvelle sortie |
-| Clips | Flux public de ta chaîne YouTube | toutes les heures |
+| Clips (et lien YouTube sur chaque page de sortie) | Flux de ta chaîne YouTube @robbkpr, sinon la liste `youtubeVideos` de `site.config.ts` | toutes les heures |
 | Produits merch | Boutique Shopify (`/products.json`, public) | toutes les heures |
 | Message aux fans (email + SMS) | Brevo, le jour de la sortie à 10 h | chaque jour, ne part que s'il y a une sortie |
 
@@ -45,6 +45,11 @@ Sur GitHub, ouvre le fichier, clique sur le crayon, modifie et valide (« Commit
   - `CRON_SECRET` : une longue phrase secrète
   - `AUTO_NOTIFY` : `true` (mets `false` pour couper les envois aux fans)
 - **Envoi automatique** : la fonction `netlify/functions/release-cron.mts` tourne chaque jour à 10 h (heure de Paris).
+
+## Budget Netlify (gratuit : 300 crédits par mois)
+- Chaque mise en ligne (chaque « Commit changes » sur GitHub) coûte environ **15 crédits**. Groupe tes modifications : modifie `site.config.ts` en une seule fois.
+- Les nouvelles sorties, pochettes et liens n'ont **pas** besoin de mise en ligne : la page se met à jour toute seule.
+- Le compteur de crédits est en haut à gauche dans Netlify. Si tu approches de 0, ne fais plus de modifications avant le mois suivant.
 
 ## Brancher robbmusic.fr (plus tard)
 1. Achète `robbmusic.fr` chez OVH, au nom d'Iridium Music (SIREN demandé).

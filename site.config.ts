@@ -51,8 +51,20 @@ export const site = {
   // ── Clips ──
   // ID de ta chaîne YouTube (commence par UC…) : les 6 derniers clips s'affichent seuls.
   youtubeChannelId: "UCjOKqHWhx24wicz5EbB6Uxg", // @robbkpr
-  // Ou, à défaut, une liste d'ID de vidéos (la partie après watch?v=)
-  youtubeVideoIds: [] as string[],
+  // Liste de secours (le flux YouTube est parfois indisponible). Le plus récent en premier.
+  // Pour un nouveau clip : ajoute une ligne en haut avec l'ID (la partie après watch?v=) et le titre.
+  youtubeVideos: [
+    { id: "HBWM0p_iyIE", title: "ROBB - LA MEUTE (LIVE SESSION 07) | LIVE À LA BOULE NOIRE" },
+    { id: "QPudcHdwLic", title: "ROBB - WAGYU feat. WB (LIVE SESSION #6)" },
+    { id: "tOlv1Lv8WAs", title: "ROBB - MOULES MARINIÈRES (LIVE SESSION #5)" },
+    { id: "7uzlskPunHs", title: "ROBB - LE KŒUR DES MIENS (LIVE SESSION #4)" },
+    { id: "kX2BOjeXJRk", title: "ROBB - SINISTROS (LIVE SESSION #3)" },
+    { id: "J46kKUCuRVI", title: "ROBB - NIRMAL PURJA (LIVE SESSION #2)" },
+    { id: "pB1iTD71vvc", title: "ROBB - GEOMETRY DASH 11/11 (LIVE SESSION #1) | Devant La Boule Noire" },
+    { id: "nRABQ6Lq9BQ", title: "ROBB - Vraies Excuses" },
+    { id: "gRqAAIxVNn4", title: "ROBB, Mick - Tous les jours" },
+    { id: "knSUnDj3W2M", title: "ROBB - Algorand" },
+  ] as { id: string; title: string }[],
 
   // ── Boutique Shopify (produits lus automatiquement) ──
   shopUrl: "https://robbshop.fr",
