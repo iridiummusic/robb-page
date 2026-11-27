@@ -3,46 +3,97 @@ import { site } from "@/site.config";
 
 export type PlatformLink = { key: string; label: string; url: string };
 
-// Ordre d'affichage des boutons d'écoute
-const PLATFORMS: { key: string; label: string; search?: (q: string) => string }[] = [
-  { key: "spotify", label: "Spotify", search: (q) => `https://open.spotify.com/search/${encodeURIComponent(q)}` },
-  { key: "appleMusic", label: "Apple Music", search: (q) => `https://music.apple.com/fr/search?term=${encodeURIComponent(q)}` },
-  { key: "deezer", label: "Deezer" },
-  { key: "youtubeMusic", label: "YouTube Music", search: (q) => `https://music.youtube.com/search?q=${encodeURIComponent(q)}` },
-  { key: "youtube", label: "YouTube" },
-  { key: "amazonMusic", label: "Amazon Music" },
-  { key: "tidal", label: "Tidal" },
-  { key: "soundcloud", label: "SoundCloud" },
-];
+const LABELS: Record<string, string> = {
+  spotify: "Spotify",
+  appleMusic: "Apple Music",
+  deezer: "Deezer",
+  youtubeMusic: "YouTube Music",
+  youtube: "YouTube",
+  amazonMusic: "Amazon Music",
+  tidal: "Tidal",
+  soundcloud: "SoundCloud",
+};
+const ORDER = Object.keys(LABELS);
+
+const day = { next: { revalidate: 86400 } } as const;
+
+/** Code-barres (UPC) de la sortie, lu sur Deezer : il sert à la retrouver partout ailleurs. */
+async function getUpc(release: Release): Promise<string | null> {
+  try {
+    const res = await fetch(`https://api.deezer.com/album/${release.id}`, { ...day, signal: AbortSignal.timeout(6000) });
+    const json = await res.json();
+    return json?.upc ? String(json.upc) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Apple Music : API publique iTunes, recherche par UPC (aucun compte requis). */
+async function appleByUpc(upc: string): Promise<string | null> {
+  try {
+    const res = await fetch(`https://itunes.apple.com/lookup?upc=${upc}&entity=album&country=FR`, {
+      ...day,
+      signal: AbortSignal.timeout(6000),
+    });
+    const json = JSON.parse(await res.text());
+    const url: string | undefined = json?.results?.[0]?.collectionViewUrl;
+    return url ? url.replace(/\?uo=\d+$/, "") : null;
+  } catch {
+    return null;
+  }
+}
 
 /**
- * Liens de toutes les plateformes pour une sortie, via l'API publique Odesli (song.link).
- * Mis en cache 24 h. Si Odesli ne répond pas, on garde Deezer + des liens de recherche.
+ * Spotify : seulement si SPOTIFY_CLIENT_ID et SPOTIFY_CLIENT_SECRET sont renseignés
+ * (application Spotify for Developers, compte Premium requis par Spotify).
+ */
+async function spotifyByUpc(upc: string): Promise<string | null> {
+  const id = process.env.SPOTIFY_CLIENT_ID;
+  const secret = process.env.SPOTIFY_CLIENT_SECRET;
+  if (!id || !secret) return null;
+  try {
+    const tok = await fetch("https://accounts.spotify.com/api/token", {
+      method: "POST",
+      headers: {
+        "content-type": "application/x-www-form-urlencoded",
+        authorization: "Basic " + Buffer.from(`${id}:${secret}`).toString("base64"),
+      },
+      body: "grant_type=client_credentials",
+      cache: "no-store",
+    }).then((r) => r.json());
+    if (!tok?.access_token) return null;
+    const res = await fetch(`https://api.spotify.com/v1/search?type=album&market=FR&q=upc:${upc}`, {
+      headers: { authorization: `Bearer ${tok.access_token}` },
+      ...day,
+    });
+    const json = await res.json();
+    return json?.albums?.items?.[0]?.external_urls?.spotify ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Liens d'écoute d'une sortie. Automatique pour Deezer et Apple Music,
+ * Spotify si les clés sont configurées, sinon une recherche Spotify ciblée.
+ * Un lien peut toujours être forcé dans site.config.ts (linkOverrides).
  */
 export async function getPlatformLinks(release: Release): Promise<PlatformLink[]> {
-  let found: Record<string, { url: string }> = {};
-  try {
-    const res = await fetch(
-      `https://api.song.link/v1-alpha.1/links?userCountry=FR&url=${encodeURIComponent(release.deezerUrl)}`,
-      { next: { revalidate: 86400 }, signal: AbortSignal.timeout(8000) }
-    );
-    if (res.ok) found = (await res.json())?.linksByPlatform ?? {};
-  } catch {}
+  const found: Record<string, string> = { deezer: release.deezerUrl };
+  const upc = await getUpc(release);
+  if (upc) {
+    const [apple, spotify] = await Promise.all([appleByUpc(upc), spotifyByUpc(upc)]);
+    if (apple) found.appleMusic = apple;
+    if (spotify) found.spotify = spotify;
+  }
 
-  const query = `${site.artist} ${release.name}`;
-  const links: PlatformLink[] = [];
-  for (const p of PLATFORMS) {
-    const url = found[p.key]?.url ?? (p.key === "deezer" ? release.deezerUrl : undefined);
-    if (url) links.push({ key: p.key, label: p.label, url });
-  }
-  // Odesli muet : on garantit au moins Spotify / Apple / YouTube Music en recherche
-  if (links.length < 3) {
-    for (const p of PLATFORMS) {
-      if (p.search && !links.some((l) => l.key === p.key)) {
-        links.push({ key: p.key, label: p.label, url: p.search(query) });
-      }
-    }
-    links.sort((a, b) => PLATFORMS.findIndex((p) => p.key === a.key) - PLATFORMS.findIndex((p) => p.key === b.key));
-  }
-  return links;
+  const q = encodeURIComponent(`${site.artist} ${release.name}`);
+  found.spotify ??= `https://open.spotify.com/search/${q}`;
+  found.appleMusic ??= `https://music.apple.com/fr/search?term=${q}`;
+  found.youtubeMusic ??= `https://music.youtube.com/search?q=${q}`;
+
+  const overrides = (site.linkOverrides as Record<string, Record<string, string>>)[release.slug] ?? {};
+  Object.assign(found, overrides);
+
+  return ORDER.filter((k) => found[k]).map((k) => ({ key: k, label: LABELS[k], url: found[k] }));
 }
