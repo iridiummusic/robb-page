@@ -7,7 +7,7 @@ export default function Legal() {
   return (
     <div className="stage" style={{ padding: "0 20px 64px" }}>
       <article className="legal-page">
-        <a className="wordmark" href="/">{site.artist}</a>
+        <a className="wordmark" href="/" style={{ display: "inline-block", padding: "22px 0 10px" }}>{site.artist}</a>
         <h1>Mentions légales</h1>
         <p>
           Ce site est édité par {l.company}
