@@ -1,14 +1,14 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getRelease, formatDate, typeLabel } from "@/lib/catalog";
+import { getRelease, getCatalog } from "@/lib/catalog";
 import { getPlatformLinks } from "@/lib/platforms";
 import { paletteFromCover } from "@/lib/palette";
 import { site } from "@/site.config";
 import Stage from "@/components/Stage";
-import ListenLinks from "@/components/ListenLinks";
-import ShareButton from "@/components/ShareButton";
 import SubscribeForm from "@/components/SubscribeForm";
 import Clip from "@/components/Clip";
+import ReleaseHero from "@/components/ReleaseHero";
+import { AudioProvider, PlayerBar } from "@/components/Audio";
 import { getClips, clipFor } from "@/lib/extras";
 
 export const revalidate = 86400;
@@ -33,37 +33,72 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 /** Smartlink : une page par sortie, permanente. */
 export default async function ReleasePage({ params }: Props) {
-  const r = await getRelease((await params).slug);
+  const slug = (await params).slug;
+  const r = await getRelease(slug);
   if (!r) notFound();
-  const [baseLinks, palette, clips] = await Promise.all([getPlatformLinks(r), paletteFromCover(r.cover), getClips()]);
+  const [baseLinks, palette, clips, catalog] = await Promise.all([
+    getPlatformLinks(r),
+    paletteFromCover(r.cover),
+    getClips(),
+    getCatalog(),
+  ]);
   const clip = clipFor(r.name, clips);
   const links = clip
     ? [...baseLinks, { key: "youtube", label: "YouTube", url: `https://www.youtube.com/watch?v=${clip.id}` }]
     : baseLinks;
+  const i = catalog.findIndex((x) => x.slug === r.slug);
+  const newer = i > 0 ? catalog[i - 1] : null;
+  const older = i >= 0 && i < catalog.length - 1 ? catalog[i + 1] : null;
 
   return (
-    <Stage cover={r.cover} palette={palette}>
-      <div className="smart">
-        <a className="wordmark" href="/">{site.artist}</a>
-        <img className="cover" src={r.cover} alt={`Pochette de ${r.title}`} />
-        <h1 className="title">{r.name}</h1>
-        <p className="meta">{[r.detail, typeLabel[r.type], formatDate(r.date)].filter(Boolean).join(" · ")}</p>
-        <ListenLinks links={links} source={r.slug} />
-        <div className="hero-actions">
-          <ShareButton url={`${site.url}/${r.slug}`} title={`${site.artist} — ${r.name}`} />
-          <a className="ghost" href="/">Toute la musique de {site.artist}</a>
-        </div>
-        {clip && (
-          <section className="block" aria-labelledby="h-clip">
-            <h2 id="h-clip">Le clip</h2>
-            <Clip id={clip.id} title={clip.title} />
+    <AudioProvider>
+      <Stage cover={r.cover} palette={palette}>
+        <header className="topbar">
+          <a className="wordmark" href="/" aria-label={`${site.artist}, accueil`}>
+            {site.artist}
+          </a>
+          <a className="topbar-cta" href="/">
+            Toute la musique
+          </a>
+        </header>
+        <div className="smart">
+          <ReleaseHero release={r} links={links} />
+          {clip && (
+            <section className="block" aria-labelledby="h-clip">
+              <h2 id="h-clip">Le clip</h2>
+              <Clip id={clip.id} title={clip.title} />
+            </section>
+          )}
+          <section className="block meute" aria-labelledby="h-meute">
+            <h2 id="h-meute">Rejoins la Meute</h2>
+            <p className="hint">Un mail ou un SMS le jour de chaque sortie. Rien d'autre.</p>
+            <SubscribeForm source={`smartlink/${r.slug}`} label="J'en suis" />
           </section>
-        )}
-        <section className="block" aria-labelledby="h-sub">
-          <h2 id="h-sub">Sois prévenu de la prochaine sortie</h2>
-          <SubscribeForm source={`smartlink/${r.slug}`} />
-        </section>
-      </div>
-    </Stage>
+          {(newer || older) && (
+            <nav className="neighbors" aria-label="Autres sorties">
+              {newer && (
+                <a href={`/${newer.slug}`}>
+                  <img src={newer.coverSmall} alt="" />
+                  <span>
+                    <small>Plus récent</small>
+                    {newer.name}
+                  </span>
+                </a>
+              )}
+              {older && (
+                <a href={`/${older.slug}`} className="older">
+                  <span>
+                    <small>Plus ancien</small>
+                    {older.name}
+                  </span>
+                  <img src={older.coverSmall} alt="" />
+                </a>
+              )}
+            </nav>
+          )}
+        </div>
+        <PlayerBar />
+      </Stage>
+    </AudioProvider>
   );
 }
