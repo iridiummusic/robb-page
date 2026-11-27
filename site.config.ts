@@ -8,7 +8,7 @@ export const site = {
   artist: "ROBB",
   // Adresse finale de la page (sans / à la fin)
   url: "https://robbmusic.netlify.app", // deviendra https://robbmusic.fr
-  tagline: "Rap indépendant. Boulogne-Billancourt.",
+  tagline: "Entre chien et loup.",
 
   // Identifiant Deezer de ROBB (ne pas toucher)
   deezerArtistId: "235481721",
@@ -27,15 +27,20 @@ export const site = {
   // Pour remplacer un lien trouvé automatiquement, ex. :
   // "la-meute": { spotify: "https://open.spotify.com/album/...", youtube: "https://youtu.be/..." },
   linkOverrides: {
-    "moules-marinieres": { spotify: "https://open.spotify.com/track/38ylzljmaZmciYn3T2jLfl" },
-    "le-koeur-des-miens": { spotify: "https://open.spotify.com/track/6KQwGlPmx31uZowmPlvHsS" },
-    sinistros: { spotify: "https://open.spotify.com/track/7iZkzWmdfP6CAK3DGxjkSC" },
-    "nirmal-purja": { spotify: "https://open.spotify.com/track/6nlaiUJO52zY2CuauJa78N" },
-    "geometry-dash-11-11": { spotify: "https://open.spotify.com/track/7oBTfS7tHd1YRhjgAG9l9g" },
+    "la-meute": { spotify: "https://open.spotify.com/album/15tOy4X48ofkvrfBpcvnp3" },
+    wagyu: { spotify: "https://open.spotify.com/album/5iPVNFR4Cz2zf0WYZx3x1r" },
+    "moules-marinieres": { spotify: "https://open.spotify.com/album/7pAOn8FPQxA8lHdZHOltht" },
+    "le-koeur-des-miens": { spotify: "https://open.spotify.com/album/4KLlIJXE49cRZaTqTV1Kcn" },
+    sinistros: { spotify: "https://open.spotify.com/album/4zm8Dej5vBqOwuMiMfa7kN" },
+    "nirmal-purja": { spotify: "https://open.spotify.com/album/5NvPhp5lOHn1VOiyU4m1Z3" },
+    "geometry-dash-11-11": { spotify: "https://open.spotify.com/album/3nL24WqR48zAY9j71bQm6J" },
     stark: { spotify: "https://open.spotify.com/album/2adUc84gvzvsfJyG82NKJu" },
-    nausicaa: { spotify: "https://open.spotify.com/track/2hFSkNJOR5I23nLdyZkF7R" },
-    "vraies-excuses": { spotify: "https://open.spotify.com/track/4AqN6KAZ9x1naSXSBbFiD6" },
-    "tous-les-jours": { spotify: "https://open.spotify.com/track/6m7WLciwWSW7UwL1hciOhp" },
+    nausicaa: { spotify: "https://open.spotify.com/album/0EWmPeQSMmw1NbcgvswZ4o" },
+    "vraies-excuses": { spotify: "https://open.spotify.com/album/3Tb3TSNyQhPTbJQtMIORUf" },
+    "tous-les-jours": { spotify: "https://open.spotify.com/album/3j56CPp31tYE6eaZxWHc7w" },
+    algorand: { spotify: "https://open.spotify.com/album/1hlVY2HdCbNX7ReyoGcmtg" },
+    koeur: { spotify: "https://open.spotify.com/album/3dUmVes2G76HIKMDariAkK" },
+    nokto: { spotify: "https://open.spotify.com/album/0pS0gK0yx8h6mpXGBwn0La" },
   } as Record<string, Partial<Record<"spotify" | "appleMusic" | "deezer" | "youtubeMusic" | "youtube" | "amazonMusic" | "tidal" | "soundcloud", string>>>,
 
   // ── Concerts (les dates passées disparaissent toutes seules) ──
@@ -45,7 +50,7 @@ export const site = {
 
   // ── Clips ──
   // ID de ta chaîne YouTube (commence par UC…) : les 6 derniers clips s'affichent seuls.
-  youtubeChannelId: "",
+  youtubeChannelId: "UCjOKqHWhx24wicz5EbB6Uxg", // @robbkpr
   // Ou, à défaut, une liste d'ID de vidéos (la partie après watch?v=)
   youtubeVideoIds: [] as string[],
 
@@ -55,10 +60,10 @@ export const site = {
 
   // ── Réseaux & contact ──
   socials: {
-    instagram: "", // ex. "https://instagram.com/xxx"
-    tiktok: "",
-    youtube: "",
-    spotify: "", // lien profil artiste Spotify
+    instagram: "https://www.instagram.com/robbkpr/",
+    tiktok: "https://www.tiktok.com/@robbkpr",
+    youtube: "https://www.youtube.com/@robbkpr",
+    spotify: "https://open.spotify.com/artist/0nS0zGjOjVBH5xE1M1nBjc",
   },
   bookingEmail: "robbprod@gmail.com",
 
