@@ -8,6 +8,8 @@ import Stage from "@/components/Stage";
 import ListenLinks from "@/components/ListenLinks";
 import ShareButton from "@/components/ShareButton";
 import SubscribeForm from "@/components/SubscribeForm";
+import Clip from "@/components/Clip";
+import { getClips, clipFor } from "@/lib/extras";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -33,7 +35,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ReleasePage({ params }: Props) {
   const r = await getRelease((await params).slug);
   if (!r) notFound();
-  const [links, palette] = await Promise.all([getPlatformLinks(r), paletteFromCover(r.cover)]);
+  const [baseLinks, palette, clips] = await Promise.all([getPlatformLinks(r), paletteFromCover(r.cover), getClips()]);
+  const clip = clipFor(r.name, clips);
+  const links = clip
+    ? [...baseLinks, { key: "youtube", label: "YouTube", url: `https://www.youtube.com/watch?v=${clip.id}` }]
+    : baseLinks;
 
   return (
     <Stage cover={r.cover} palette={palette}>
@@ -47,6 +53,12 @@ export default async function ReleasePage({ params }: Props) {
           <ShareButton url={`${site.url}/${r.slug}`} title={`${site.artist} — ${r.name}`} />
           <a className="ghost" href="/">Toute la musique de {site.artist}</a>
         </div>
+        {clip && (
+          <section className="block" aria-labelledby="h-clip">
+            <h2 id="h-clip">Le clip</h2>
+            <Clip id={clip.id} title={clip.title} />
+          </section>
+        )}
         <section className="block" aria-labelledby="h-sub">
           <h2 id="h-sub">Sois prévenu de la prochaine sortie</h2>
           <SubscribeForm source={`smartlink/${r.slug}`} />
