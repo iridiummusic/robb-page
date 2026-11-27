@@ -6,8 +6,8 @@ export type Product = { title: string; url: string; image: string | null; price:
 const decode = (s: string) =>
   s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 
-/** Derniers clips : flux public de la chaîne YouTube, sinon la liste manuelle. */
-export async function getClips(limit = 6): Promise<Clip[]> {
+/** Derniers clips : flux public de la chaîne YouTube (15 dernières vidéos), sinon la liste manuelle. */
+export async function getClips(limit = 15): Promise<Clip[]> {
   if (site.youtubeChannelId) {
     try {
       const res = await fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${site.youtubeChannelId}`, {
@@ -50,4 +50,14 @@ export async function getProducts(): Promise<Product[]> {
 export function upcomingConcerts() {
   const today = new Date().toISOString().slice(0, 10);
   return site.concerts.filter((c) => c.date >= today).sort((a, b) => (a.date < b.date ? -1 : 1));
+}
+
+const norm = (t: string) =>
+  t.replace(/œ/gi, "oe").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/** Le clip YouTube d'une sortie : la vidéo la plus récente dont le titre contient le nom du titre. */
+export function clipFor(name: string, clips: Clip[]): Clip | null {
+  const n = norm(name);
+  if (n.length < 3) return null;
+  return clips.find((c) => ` ${norm(c.title)} `.includes(` ${n} `)) ?? null;
 }
