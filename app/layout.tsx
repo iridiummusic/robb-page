@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "@fontsource/big-shoulders-display/700";
 import "@fontsource/big-shoulders-display/900";
+import "@fontsource/pirata-one/400";
 import "@fontsource/instrument-sans/400";
 import "@fontsource/instrument-sans/600";
 import "./globals.css";
