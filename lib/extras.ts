@@ -21,7 +21,7 @@ export async function getClips(limit = 15): Promise<Clip[]> {
       if (clips.length) return clips.slice(0, limit);
     } catch {}
   }
-  return site.youtubeVideoIds.slice(0, limit).map((id) => ({ id, title: "" }));
+  return site.youtubeVideos.slice(0, limit);
 }
 
 /** Produits de la boutique Shopify (endpoint public products.json, aucun jeton requis). */
