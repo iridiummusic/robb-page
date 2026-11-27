@@ -7,7 +7,7 @@ Ta page à toi, sans Listenify : chaque sortie a son lien permanent, la page se 
 | Quoi | D'où ça vient | Fréquence |
 |---|---|---|
 | Sorties, pochettes, dates | Catalogue Deezer de ROBB (public, sans compte) | toutes les heures |
-| Liens Spotify, Apple Music, Deezer, YouTube, Amazon, Tidal… | Odesli / song.link (public) | à la 1re visite, puis toutes les 24 h |
+| Liens Deezer et Apple Music (par le code-barres UPC), Spotify si une clé Spotify est ajoutée, sinon une recherche Spotify ciblée | Deezer + API publique iTunes | toutes les 24 h |
 | Couleurs de la page | Teinte dominante de la dernière pochette | à chaque nouvelle sortie |
 | Clips | Flux public de ta chaîne YouTube | toutes les heures |
 | Produits merch | Boutique Shopify (`/products.json`, public) | toutes les heures |

@@ -23,6 +23,21 @@ export const site = {
     presaveUrl?: string;
   },
 
+  // ── Liens forcés (facultatif) ──
+  // Pour remplacer un lien trouvé automatiquement, ex. :
+  // "la-meute": { spotify: "https://open.spotify.com/album/...", youtube: "https://youtu.be/..." },
+  linkOverrides: {
+    "moules-marinieres": { spotify: "https://open.spotify.com/track/38ylzljmaZmciYn3T2jLfl" },
+    "le-koeur-des-miens": { spotify: "https://open.spotify.com/track/6KQwGlPmx31uZowmPlvHsS" },
+    sinistros: { spotify: "https://open.spotify.com/track/7iZkzWmdfP6CAK3DGxjkSC" },
+    "nirmal-purja": { spotify: "https://open.spotify.com/track/6nlaiUJO52zY2CuauJa78N" },
+    "geometry-dash-11-11": { spotify: "https://open.spotify.com/track/7oBTfS7tHd1YRhjgAG9l9g" },
+    stark: { spotify: "https://open.spotify.com/album/2adUc84gvzvsfJyG82NKJu" },
+    nausicaa: { spotify: "https://open.spotify.com/track/2hFSkNJOR5I23nLdyZkF7R" },
+    "vraies-excuses": { spotify: "https://open.spotify.com/track/4AqN6KAZ9x1naSXSBbFiD6" },
+    "tous-les-jours": { spotify: "https://open.spotify.com/track/6m7WLciwWSW7UwL1hciOhp" },
+  } as Record<string, Partial<Record<"spotify" | "appleMusic" | "deezer" | "youtubeMusic" | "youtube" | "amazonMusic" | "tidal" | "soundcloud", string>>>,
+
   // ── Concerts (les dates passées disparaissent toutes seules) ──
   concerts: [
     // { date: "2027-02-14", city: "Paris", venue: "La Boule Noire", ticketUrl: "https://shotgun.live/..." },
